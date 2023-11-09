@@ -1,6 +1,6 @@
 const mongoose=require('mongoose');
 
-mongoose.connect("mongodb://localhost:27017/Curdproject",{ 
+mongoose.connect("mongodb+srv://manchd123:manchd123@cluster0.qnsjl91.mongodb.net/coding",{ 
     // it will return a promise through .then function we will return it
     useNewUrlParser:true,
     useUnifiedTopology:true,

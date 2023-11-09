@@ -1,51 +1,99 @@
-{{>navbar}}
-  <body>
-     {{> centre }}
+<!DOCTYPE html>
+<html lang="en">
 
-<table class="table1">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
+
+  <title>Your Page Title</title>
+
+  <style>
+    body {
+      background-color: #f8f9fa; /* Set a light background color */
+    }
+
+    /* Your existing styles */
+
+    /* Style for the table */
+    .table1 {
+      width: 100%;
+      margin-top: 20px; /* Add some space at the top */
+      border-collapse: collapse;
+    }
+
+    .table1 th,
+    .table1 td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #dee2e6;
+    }
+
+    .table1 th {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .table1 tr:nth-child(even) {
+      background-color: #f1f1f1;
+    }
+
+    .table1 tr:hover {
+      background-color: #c8e6c9;
+    }
+  </style>
+</head>
+
+<body>
+  {{>navbar}}
+  {{> centre }}
+
+  <table class="table1">
     <thead id="mytable">
-    <tr class="bg-info">
-        <th>name</th>
-        <th>email</th>
-        <th>dob</th>
-        <th></th>
-        <th>address</th>
-    </tr>
+      <tr class="bg-info">
+        <th>Name</th>
+        <th>Email</th>
+        <th>Date of Birth</th>
+        <th>Address</th>
+      </tr>
     </thead>
     <tbody>
-        {{#each list}}
-        <tr>
-            <td>{{this.usrnm}}</td>
-            {{!-- <td>{{this.email}}</td> --}}
-            {{!-- <td>{{this.dob}}</td> --}}
-            {{!-- <td>{{this.address}}</td> --}}
-            {{!-- <td><a href="/first/{{this._id}}"><img src="/public/images/pencil.png"></a></td> --}}
-            <td><a href="/show/{{this._id}}">edit</a></td>
-           <td><a href="/show/delete/{{this._id}}" onclick="myFunction()" >delete</a></td>
-            <td></td>
-            <td><a href="/cus/{{this._id}}">Show Full Details</a></td>
-             {{!-- <td><a  class="fas fa-user-slash" onclick="return reconform('are u sure!');" href=""></a></td> --}}
-           
-        </tr>
-        {{/each}}
+      {{#each list}}
+      <tr>
+        <td>{{this.usrnm}}</td>
+        <td>{{this.email}}</td>
+        <td>{{this.dob}}</td>
+        <td>{{this.address}}</td>
+        <!-- <td><a href="/first/{{this._id}}"><img src="/public/images/pencil.png"></a></td> -->
+        <!-- <td><a href="/show/{{this._id}}">edit</a></td> -->
+        <!-- <td><a href="/show/delete/{{this._id}}" onclick="myFunction()">delete</a></td> -->
+        <!-- <td><a href="/cus/{{this._id}}">Show Full Details</a></td> -->
+        <!-- <td><a  class="fas fa-user-slash" onclick="return reconform('are u sure!');" href=""></a></td> -->
+
+      </tr>
+      {{/each}}
     </tbody>
-</table>
+  </table>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+  <!-- Optional JavaScript; choose one of the two! -->
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
-    -->
-  </body>
-  <script>
-function myFunction() {
-  alert("Hello! I am an alert box!");
-}
+  {{>footer}}
+</body>
+
+<script>
+  function myFunction() {
+    alert("Hello! I am an alert box!");
+  }
 </script>
-{{>footer}}
+
 </html>

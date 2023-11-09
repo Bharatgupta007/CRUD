@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brewery Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #008080;
+        }
+
+        .brewery-info {
+            margin-bottom: 20px;
+            border-bottom: 1px solid black;
+            padding-bottom: 10px;
+            background-color: #fff;
+        }
+
+        #search-container {
+            margin-bottom: 20px;
+        }
+
+        #loader {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            color: #008080;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #008080;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .rating-form {
+            margin-top: 10px;
+        }
+
+        @media screen and (max-width: 600px) {
+            /* Add responsive styles here */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Brewery Information</h1>
+
+    <!-- Search bar and dropdown -->
+    <div id="search-container">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <select id="searchCriteria">
+            <option value="by_postal">By Postal Code</option>
+            <option value="by_name">By Name</option>
+            <option value="by_city">By City</option>
+        </select>
+        <button onclick="search()">Search</button>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader">Loading...</div>
+
+    <div id="breweryData"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchData();
+        });
+
+        async function fetchData(searchBy = null) {
+            let apiUrl = 'https://api.openbrewerydb.org/v1/breweries?per_page=3';
+
+            if (searchBy) {
+                apiUrl += `&${searchBy.key}=${searchBy.value}`;
+            }
+
+            // Show loader
+            showLoader();
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                // Hide loader
+                hideLoader();
+
+                // Display data in the specified format
+                await displayBreweryData(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+
+                // Hide loader in case of an error
+                hideLoader();
+            }
+        }
+
+        async function displayBreweryData(data) {
+            const breweryDataContainer = document.getElementById('breweryData');
+
+            for (const brewery of data) {
+                // Fetch and append the ratings to the existing brewery object
+                const ratings = await fetchRatings(brewery.id);
+                brewery.ratings = ratings;
+
+                // Create a div for each brewery
+                const breweryInfo = document.createElement('div');
+                breweryInfo.classList.add('brewery-info');
+
+                // Create elements for the brewery information
+                const breweryName = document.createElement('p');
+                breweryName.innerText = `Brewery Name: ${brewery.name}`;
+
+                const breweryAddress = document.createElement('p');
+                breweryAddress.innerText = `Brewery Address: ${brewery.street}, ${brewery.city}, ${brewery.state}`;
+
+                const phoneNumber = document.createElement('p');
+                phoneNumber.innerText = `Phone Number: ${brewery.phone || 'N/A'}`;
+
+                const websiteURL = document.createElement('p');
+                websiteURL.innerHTML = `Website URL: <a href="${brewery.website_url || '#'}">${brewery.website_url || 'N/A'}</a>`;
+
+                // Rating Form
+                const ratingForm = document.createElement('form');
+                ratingForm.classList.add('rating-form');
+                ratingForm.innerHTML = `
+                    <label for="ratingSelect">Rate this brewery (1-5): </label>
+                    <select id="ratingSelect" name="rating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button type="button" onclick="submitRating('${brewery.id}', '{{username}}', document.getElementById('ratingSelect').value)">Submit Rating</button>
+                `;
+
+                // Ratings Info
+                const ratingsInfoElement = document.createElement('p');
+                if (brewery.ratings.length > 0) {
+                    const ratingsString = `<br/>${brewery.ratings.map(review => `${review.rating} by ${review.username}`).join('<br>')}`;
+
+                    ratingsInfoElement.innerHTML = `Ratings: ${ratingsString}`;
+                } else {
+                    ratingsInfoElement.innerText = 'No Ratings';
+                }
+
+                // Add each piece of information to the brewery info container
+                breweryInfo.appendChild(breweryName);
+                breweryInfo.appendChild(breweryAddress);
+                breweryInfo.appendChild(phoneNumber);
+                breweryInfo.appendChild(websiteURL);
+                breweryInfo.appendChild(ratingsInfoElement); // Append the ratings info element
+                breweryInfo.appendChild(ratingForm);
+
+                // Add the brewery info container to the main container
+                breweryDataContainer.appendChild(breweryInfo);
+            }
+        }
+
+        async function fetchRatings(breweryId) {
+            try {
+                const response = await fetch(`/getRatings?breweryId=${breweryId}`);
+                const data = await response.json();
+                return data.data; // Assuming your API returns an array of reviews
+            } catch (error) {
+                console.error(`Error fetching ratings for ${breweryId}:`, error);
+                return [];
+            }
+        }
+
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        async function submitRating(breweryId, username, rating) {
+
+            // Make a request to save the rating in MongoDB
+            try {
+                const response = await fetch('/saveRating', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ breweryId, rating, username }),
+                });
+
+                const data = await response.json();
+                console.log(data); // Log the response (success or error)
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+            }
+        }
+
+        function search() {
+            // Get the search input value and selected search criteria
+            var searchInput = document.getElementById('searchInput').value.toLowerCase();
+            var searchCriteria = document.getElementById('searchCriteria').value;
+
+            // Hide all content divs
+            var contentDivs = document.querySelectorAll('.brewery-info');
+            contentDivs.forEach(function(div) {
+                div.style.display = 'none';
+            });
+
+            // If search input is provided, make an API call with the appropriate search criteria
+            if (searchInput) {
+                const searchBy = getSearchCriteria(searchCriteria, searchInput);
+                fetchData(searchBy);
+            }
+        }
+
+        function getSearchCriteria(criteria, value) {
+            switch (criteria) {
+                case 'by_postal':
+                    return { key: 'by_postal', value: value };
+                case 'by_name':
+                    return { key: 'by_name', value: value };
+                case 'by_city':
+                    return { key: 'by_city', value: value };
+                default:
+                    return null;
+            }
+        }
+    </script>
+
+    <!-- ... (your existing HTML code) ... -->
+
+</body>
+</html>

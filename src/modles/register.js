@@ -19,7 +19,7 @@ const userSchema=new mongoose.Schema({
         required:true
     }    
 })
-const Newdata=new mongoose.model("Newdata",userSchema);
+const Newdata=new mongoose.model("Newdata",userSchema,'coding');
 module.exports=Newdata; 
 
 
